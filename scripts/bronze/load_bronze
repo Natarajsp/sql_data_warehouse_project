@@ -1,0 +1,237 @@
+/*
+===============================================================================
+Stored Procedure: Load Bronze Layer (Source -> Bronze)
+===============================================================================
+Script Purpose:
+    This stored procedure loads data into the 'bronze' schema from external CSV files. 
+    It performs the following actions:
+    - Truncates the bronze tables before loading data.
+    - Uses the `BULK INSERT` command to load data from csv Files to bronze tables.
+
+Parameters:
+    None. 
+	  This stored procedure does not accept any parameters or return any values.
+
+Usage Example:
+    EXEC bronze.load_bronze;
+===============================================================================
+*/
+
+USE DataWarehouse;
+GO
+
+CREATE OR ALTER PROCEDURE bronze.load_bronze 
+AS 
+BEGIN
+	DECLARE 
+		@start_procedure_time DATETIME,
+		@end_procedure_time DATETIME,
+		@start_step_time DATETIME,
+		@end_step_time DATETIME;
+
+	BEGIN TRY 
+		-- Procedure Start
+		SET @start_procedure_time = GETDATE();
+		PRINT '====================================================================';
+		PRINT 'Procedure Name : bronze.load_bronze';
+		PRINT 'Execution Start Time : ' + CAST(@start_procedure_time AS VARCHAR);
+		PRINT '====================================================================';
+
+		------------------------------------------------------------------
+		-- Step 1: Load CRM Customer Info
+		------------------------------------------------------------------
+		PRINT 'STEP 1: Loading data into datawarehouse.bronze.crm_cust_info';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.crm_cust_info)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.crm_cust_info';
+			TRUNCATE TABLE datawarehouse.bronze.crm_cust_info;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.crm_cust_info 
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into crm_cust_info successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Step 2: Load CRM Product Info
+		------------------------------------------------------------------
+		PRINT 'STEP 2: Loading data into datawarehouse.bronze.crm_prd_info';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.crm_prd_info)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.crm_prd_info';
+			TRUNCATE TABLE datawarehouse.bronze.crm_prd_info;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.crm_prd_info 
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into crm_prd_info successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Step 3: Load CRM Sales Details
+		------------------------------------------------------------------
+		PRINT 'STEP 3: Loading data into datawarehouse.bronze.crm_sales_details';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.crm_sales_details)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.crm_sales_details';
+			TRUNCATE TABLE datawarehouse.bronze.crm_sales_details;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.crm_sales_details 
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into crm_sales_details successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Step 4: Load ERP Customer AZ12
+		------------------------------------------------------------------
+		PRINT 'STEP 4: Loading data into datawarehouse.bronze.erp_cust_AZ12';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.erp_cust_AZ12)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.erp_cust_AZ12';
+			TRUNCATE TABLE datawarehouse.bronze.erp_cust_AZ12;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.erp_cust_AZ12
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_erp\CUST_AZ12.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into erp_cust_AZ12 successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Step 5: Load ERP Location A101
+		------------------------------------------------------------------
+		PRINT 'STEP 5: Loading data into datawarehouse.bronze.erp_LOC_A101';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.erp_LOC_A101)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.erp_LOC_A101';
+			TRUNCATE TABLE datawarehouse.bronze.erp_LOC_A101;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.erp_LOC_A101
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_erp\LOC_A101.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into erp_LOC_A101 successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Step 6: Load ERP Product Category PX_CAT_G1V2
+		------------------------------------------------------------------
+		PRINT 'STEP 6: Loading data into datawarehouse.bronze.erp_PX_CAT_G1V2';
+		SET @start_step_time = GETDATE();
+
+		IF EXISTS (SELECT 1 FROM datawarehouse.bronze.erp_PX_CAT_G1V2)
+		BEGIN
+			PRINT 'Truncating table: datawarehouse.bronze.erp_PX_CAT_G1V2';
+			TRUNCATE TABLE datawarehouse.bronze.erp_PX_CAT_G1V2;
+			PRINT 'Table truncated successfully.';
+		END
+		ELSE 
+			PRINT 'Table is already empty.';
+
+		BULK INSERT datawarehouse.bronze.erp_PX_CAT_G1V2
+		FROM 'C:\Users\Nataraj Patil\OneDrive\Music\Documents\Data Engineer Resources\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+		WITH (
+			FIELDTERMINATOR = ',',
+			ROWTERMINATOR = '\n',
+			FIRSTROW = 2,
+			TABLOCK
+		);
+
+		SET @end_step_time = GETDATE();
+		PRINT 'Loaded data into erp_PX_CAT_G1V2 successfully.';
+		PRINT 'Step Duration: ' + CAST(DATEDIFF(SECOND, @start_step_time, @end_step_time) AS VARCHAR) + ' seconds.';
+		PRINT '------------------------------------------------------------';
+
+		------------------------------------------------------------------
+		-- Procedure End Summary
+		------------------------------------------------------------------
+		SET @end_procedure_time = GETDATE();
+		PRINT '====================================================================';
+		PRINT 'Procedure Execution Completed Successfully.';
+		PRINT 'End Time   : ' + CAST(@end_procedure_time AS VARCHAR);
+		PRINT 'Total Duration : ' + CAST(DATEDIFF(SECOND, @start_procedure_time, @end_procedure_time) AS VARCHAR) + ' seconds.';
+		PRINT '====================================================================';
+	END TRY 
+
+	BEGIN CATCH 
+		PRINT '====================================================================';
+		PRINT 'Error occurred during procedure execution.';
+		PRINT 'Error Message : ' + ERROR_MESSAGE();
+		PRINT 'Error Line    : ' + CAST(ERROR_LINE() AS VARCHAR);
+		PRINT 'Error Message' + CAST (ERROR_STATE() AS NVARCHAR);
+		PRINT '====================================================================';
+	END CATCH
+END
+GO
+
+EXEC bronze.load_bronze;
+GO
